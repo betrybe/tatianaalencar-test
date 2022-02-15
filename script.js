@@ -12,7 +12,11 @@ function createCustomElement(element, className, innerText) {
   return e;
 }
 
-function createProductItemElement({ sku, name, image }) {
+function createProductItemElement({
+  sku,
+  name,
+  image,
+}) {
   const section = document.createElement('section');
   section.className = 'item';
 
@@ -32,7 +36,11 @@ function cartItemClickListener(event) {
   // coloque seu código aqui
 }
 
-function createCartItemElement({ sku, name, salePrice }) {
+function createCartItemElement({
+  sku,
+  name,
+  salePrice,
+}) {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
@@ -40,4 +48,37 @@ function createCartItemElement({ sku, name, salePrice }) {
   return li;
 }
 
-window.onload = () => { };
+function setListOfProducts(data) {
+  const products = data.results.map(function (product) {
+    const productObject = {
+      sku: product.id,
+      name: product.title,
+      image: product.thumbnail,
+    };
+    return productObject;
+  });
+
+  products.forEach(function (product) {
+    document.querySelector('.items').appendChild(createProductItemElement(product));
+  });
+}
+
+// Função assíncrona que obtém os detalhes de um produto para inserí-lo no carrinho de compras
+async function getProducts(query) {
+  const url = `https://api.mercadolibre.com/sites/MLB/search?q=${query}`;
+
+  await fetch(url)
+    .then(function (res) {
+      return res.json();
+    })
+    .then(function (data) {
+      setListOfProducts(data);
+    })
+    .catch(function (error) {
+      console.log(error.message);
+    });
+}
+
+window.onload = () => {
+  getProducts('computador');
+};
