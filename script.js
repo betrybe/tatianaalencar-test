@@ -193,6 +193,18 @@ async function getProducts(query) {
 /* ---------------------------------------- */
 
 window.onload = () => {
+  document.querySelector('.empty-cart').addEventListener('click', function () {
+    const productsList = document.querySelector('.cart__items');
+
+    /* optei por não utilizar jQuery para limpar a lista, mesmo sendo mais simples ($('.cart__items').empty())
+    para utilizar apenas JavaScript, pois não sei o momento em que o aluno está no curso */
+    while (productsList.firstChild) productsList.removeChild(productsList.firstChild);
+
+    localStorage.clear();
+
+    sumCartProducts();
+  });
+  
   getProducts('computador');
   getCartStorage();
   sumCartProducts();
