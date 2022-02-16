@@ -2,6 +2,19 @@
 function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
+
+// Função que soma os itens do carrinho de compras
+function sumCartProducts() {
+  let sum = 0;
+
+  document.querySelectorAll('.cart__item').forEach(function (product) {
+    const details = product.innerText;
+    const price = details.substring(details.indexOf('PRICE: ') + 8, details.length);
+    sum += parseFloat(price);
+  });
+
+  document.querySelector('.total-price').innerHTML = Math.trunc(sum * 100) / 100;
+}
 /* ---------------------------------------- */
 
 /* Create elements */
@@ -60,6 +73,7 @@ function cartItemClickListener(event) {
   const element = event.target;
   element.parentNode.removeChild(element);
   removeProductFromStorage(element);
+  sumCartProducts();
 }
 
 function createCartItemElement({
@@ -117,6 +131,7 @@ function setProductOnCart(data) {
 
   document.querySelector('ol.cart__items').appendChild(createCartItemElement(details));
   addProductToStorage(details);
+  sumCartProducts();
 }
 
 // Função assíncrona que obtém os detalhes de um produto para inserí-lo no carrinho de compras
@@ -180,4 +195,5 @@ async function getProducts(query) {
 window.onload = () => {
   getProducts('computador');
   getCartStorage();
+  sumCartProducts();
 };
