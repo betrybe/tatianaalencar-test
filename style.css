@@ -197,4 +197,10 @@ header .page_title {
   flex-basis: 20%;
 }
 
+.loading {
+  font-size: 17pt;
+  font-weight: 900;
+  color: rgb(33, 27, 21);
+}
+
 /* ---------------------- */
