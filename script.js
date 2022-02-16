@@ -1,3 +1,10 @@
+/* Utils */
+function getSkuFromProductItem(item) {
+  return item.querySelector('span.item__sku').innerText;
+}
+/* ---------------------------------------- */
+
+/* Create elements */
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -28,13 +35,31 @@ function createProductItemElement({
   return section;
 }
 
-function getSkuFromProductItem(item) {
-  return item.querySelector('span.item__sku').innerText;
+// Função que remove um produto na LocalStorage a cada exclusão de produto no carrinho
+function removeProductFromStorage(product) {
+  if (localStorage.getItem('cart') !== null) {
+    const details = product.innerText;
+    const sku = details.substring(5, details.indexOf('|') - 1);
+
+    let cartStorage = [];
+    cartStorage = localStorage.getItem('cart');
+    cartStorage = JSON.parse(cartStorage);
+
+    const search = cartStorage.findIndex(function (item) {
+      return item.sku === sku;
+    });
+
+    cartStorage.splice(search, 1);
+
+    cartStorage = JSON.stringify(cartStorage);
+    localStorage.setItem('cart', cartStorage);
+  }
 }
 
 function cartItemClickListener(event) {
   const element = event.target;
   element.parentNode.removeChild(element);
+  removeProductFromStorage(element);
 }
 
 function createCartItemElement({
@@ -49,6 +74,38 @@ function createCartItemElement({
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
+/* ---------------------------------------- */
+
+/* Product Cart */
+// Função que obtém o carrinho de compras da LocalStorage
+function getCartStorage() {
+  let cartStorage = [];
+
+  if (localStorage.getItem('cart') !== null) {
+    cartStorage = localStorage.getItem('cart');
+    cartStorage = JSON.parse(cartStorage);
+
+    cartStorage.forEach(function (details) {
+      const cartElement = createCartItemElement(details);
+      document.querySelector('.cart__items').appendChild(cartElement);
+    });
+  }
+}
+
+// Função que adiciona um produto na LocalStorage a cada inserção de produto no carrinho
+function addProductToStorage(details) {
+  let cartStorage = [];
+
+  if (localStorage.getItem('cart') !== null) {
+    cartStorage = localStorage.getItem('cart');
+    cartStorage = JSON.parse(cartStorage);
+  }
+
+  cartStorage.push(details);
+  cartStorage = JSON.stringify(cartStorage);
+
+  localStorage.setItem('cart', cartStorage);
+}
 
 /* Product Cart */
 function setProductOnCart(data) {
@@ -59,6 +116,7 @@ function setProductOnCart(data) {
   };
 
   document.querySelector('ol.cart__items').appendChild(createCartItemElement(details));
+  addProductToStorage(details);
 }
 
 // Função assíncrona que obtém os detalhes de um produto para inserí-lo no carrinho de compras
@@ -121,4 +179,5 @@ async function getProducts(query) {
 
 window.onload = () => {
   getProducts('computador');
+  getCartStorage();
 };
